@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in | Demo Patient Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">Demo Patient Portal</span>
+    <span class="tag">Synthetic demo - not a real clinic</span>
+</header>
+
+<main class="card narrow">
+    <h1>Sign in</h1>
+    <p class="muted">Use the synthetic demo account listed in the project README.</p>
+
+    <div id="login-error" class="alert error" role="alert" data-testid="login-error" hidden></div>
+
+    <form id="login-form" novalidate data-testid="login-form">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="off" data-testid="username">
+        <span class="field-error" id="error-username" data-testid="error-username"></span>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="off" data-testid="password">
+        <span class="field-error" id="error-password" data-testid="error-password"></span>
+
+        <button type="submit" id="sign-in" class="primary" data-testid="sign-in">Sign in</button>
+    </form>
+</main>
+
+<script src="app.js"></script>
+<script>Portal.initLogin();</script>
+</body>
+</html>

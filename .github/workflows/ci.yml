@@ -1,0 +1,60 @@
+name: UI tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: Browser (chrome | firefox | edge)
+        required: false
+        default: chrome
+      tags:
+        description: Cucumber tag expression
+        required: false
+        default: not @wip
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-tests:
+    name: Cucumber (${{ github.event.inputs.browser || 'chrome' }}, headless)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      # GitHub-hosted Ubuntu runners ship Chrome and Firefox; Selenium Manager resolves matching drivers.
+      # Inputs are passed through env vars (not inlined into the script) to avoid shell injection.
+      - name: Run scenarios
+        env:
+          BROWSER: ${{ github.event.inputs.browser || 'chrome' }}
+          TAGS: ${{ github.event.inputs.tags || 'not @wip' }}
+        run: mvn -B verify -Dbrowser="$BROWSER" -Dheadless=true -Dcucumber.filter.tags="$TAGS"
+
+      - name: Upload Cucumber reports and failure screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-reports-${{ github.event.inputs.browser || 'chrome' }}
+          path: |
+            target/cucumber-reports/
+            target/screenshots/
+            target/surefire-reports/
+          retention-days: 14
+          if-no-files-found: warn

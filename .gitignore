@@ -1,0 +1,22 @@
+# Build output and reports
+target/
+*.class
+test-output/
+
+# Local overrides / secrets
+*.local.properties
+.env
+.env.*
+
+# Logs
+*.log
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db

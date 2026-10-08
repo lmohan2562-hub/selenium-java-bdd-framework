@@ -1,0 +1,74 @@
+# Selenium Grid 4 (hub + Chrome and Firefox nodes) for RemoteWebDriver runs.
+#
+# Option A - Grid in Docker, tests on your machine:
+#   docker compose up -d
+#   mvn -B verify -Dremote.url=http://localhost:4444 -Dapp.bind=0.0.0.0 -Dapp.host=host.docker.internal
+#
+# Option B - everything in Docker (tests container serves the demo app to the nodes):
+#   docker compose --profile tests up --exit-code-from tests
+#
+# Grid console: http://localhost:4444/ui
+services:
+  selenium-hub:
+    image: selenium/hub:4.25.0
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:4444/status"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  chrome:
+    image: selenium/node-chrome:4.25.0
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=2
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  firefox:
+    image: selenium/node-firefox:4.25.0
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=2
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  tests:
+    profiles: ["tests"]
+    image: maven:3.9.9-eclipse-temurin-17
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - maven-repo:/root/.m2
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+      chrome:
+        condition: service_started
+    command: >
+      mvn -B verify
+      -Dbrowser=${BROWSER:-chrome}
+      -Dremote.url=http://selenium-hub:4444
+      -Dapp.bind=0.0.0.0
+      -Dapp.host=tests
+      -Dapp.port=8085
+
+volumes:
+  maven-repo:

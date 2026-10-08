@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Appointments | Demo Patient Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+    <span class="brand">Demo Patient Portal</span>
+    <span class="user">
+        <span id="welcome" data-testid="welcome"></span>
+        <button id="logout" class="link" data-testid="logout">Sign out</button>
+    </span>
+</header>
+
+<main class="layout">
+    <section class="card" aria-labelledby="book-heading">
+        <h1 id="book-heading">Book an appointment</h1>
+
+        <div id="confirmation" class="alert success" role="status" data-testid="confirmation" hidden>
+            Appointment booked. Confirmation number
+            <strong id="confirmation-number" data-testid="confirmation-number"></strong>
+        </div>
+
+        <form id="booking-form" novalidate data-testid="booking-form">
+            <label for="department">Department</label>
+            <select id="department" data-testid="department">
+                <option value="">Select a department</option>
+            </select>
+            <span class="field-error" id="error-department" data-testid="error-department"></span>
+
+            <label for="provider">Provider</label>
+            <select id="provider" data-testid="provider" disabled>
+                <option value="">Select a department first</option>
+            </select>
+            <span class="loading" id="provider-loading" data-testid="provider-loading" hidden>Loading providers...</span>
+            <span class="field-error" id="error-provider" data-testid="error-provider"></span>
+
+            <label for="date">Date <span class="hint">(YYYY-MM-DD)</span></label>
+            <input id="date" placeholder="YYYY-MM-DD" autocomplete="off" data-testid="date">
+            <span class="field-error" id="error-date" data-testid="error-date"></span>
+
+            <label for="time">Time</label>
+            <select id="time" data-testid="time">
+                <option value="">Select a time</option>
+                <option>08:30</option>
+                <option>09:00</option>
+                <option>10:15</option>
+                <option>11:00</option>
+                <option>13:30</option>
+                <option>14:45</option>
+                <option>16:00</option>
+            </select>
+            <span class="field-error" id="error-time" data-testid="error-time"></span>
+
+            <fieldset>
+                <legend>Visit type</legend>
+                <label class="inline"><input type="radio" name="visitType" value="In person" data-testid="visit-in-person" checked> In person</label>
+                <label class="inline"><input type="radio" name="visitType" value="Telehealth" data-testid="visit-telehealth"> Telehealth</label>
+            </fieldset>
+
+            <label for="phone">Contact phone <span class="hint">(555-010-0000 format)</span></label>
+            <input id="phone" autocomplete="off" data-testid="phone">
+            <span class="field-error" id="error-phone" data-testid="error-phone"></span>
+
+            <label for="reason">Reason for visit</label>
+            <textarea id="reason" rows="3" maxlength="200" data-testid="reason"></textarea>
+            <span class="field-error" id="error-reason" data-testid="error-reason"></span>
+
+            <label class="inline">
+                <input type="checkbox" id="consent" data-testid="consent">
+                I confirm this is synthetic test data
+            </label>
+            <span class="field-error" id="error-consent" data-testid="error-consent"></span>
+
+            <button type="submit" id="book" class="primary" data-testid="book">Book appointment</button>
+            <span class="loading" id="booking-spinner" data-testid="booking-spinner" hidden>Booking...</span>
+        </form>
+    </section>
+
+    <section class="card" aria-labelledby="list-heading">
+        <h2 id="list-heading">Upcoming appointments</h2>
+        <table id="appointments-table" data-testid="appointments-table">
+            <thead>
+            <tr>
+                <th>Confirmation</th>
+                <th>Department</th>
+                <th>Provider</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Visit type</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+</main>
+
+<script src="app.js"></script>
+<script>Portal.initAppointments();</script>
+</body>
+</html>
